@@ -10,6 +10,9 @@ public class metodosTareas {
 	public float valorYen = 0.17f;
 	public float perimetro;
 	public float PI = 3.1416f;
+	public Integer MAX = 10;
+	public String[][] datos = new String[MAX][2];
+	public Integer posicion = 0;
 	
 	// Metodos generales
 	public void imprime(String valor){
@@ -37,6 +40,7 @@ public class metodosTareas {
 				case "t1": this.menu1(); break;
 				case "t2": this.menu2(); break;
 				case "t3": this.menu3(); break;
+				case "t4": this.menu4(); break;
 			}
 		} else {
 			this.imprime("Gracias por usar el sistema");
@@ -277,6 +281,107 @@ public class metodosTareas {
 		this.imprime("El perimetro del circulo es: "+ perimetro);
 		
 		this.repeat("t3");
+	}
+	
+	// Tarea 4
+	public void menu4(){
+		Integer opcion = 0;
+		this.imprime("Trabajando con arreglos");
+		this.imprime("1.- Registrar Alumno");
+		this.imprime("2.- Buscar alumno por matricula");
+		this.imprime("3.- Listar alumnos");
+		this.imprime("4.- Eliminar alumno");
+		
+		try {
+			opcion = sc.nextInt();
+			switch (opcion) {
+			case 1: this.registraAlumno(); break;
+			case 2: this.buscaAlumno(); break;
+			case 3: this.listarAlumnos(); break;
+			case 4: this.eliminarAlumno(); break;
+			default:
+				this.imprime("Opcion no valida, favor de seleccionar una correcta");
+				this.menu4();
+				break;
+			}
+		} catch (Exception e) {
+			this.imprime("Error!! seleccionar solo numeros enteros, volver a ejecutar");
+		}
+	}
+	
+	public void registraAlumno(){
+		String alumno = "", matricula = "";
+		try {
+			if (posicion < MAX) {
+				this.imprime("Ingresa el nombre del alumno\t");
+				alumno = sc.next();
+				
+				this.imprime("Ingresa la matricula\t");
+				matricula = sc.next();
+				
+				datos[posicion][0] = alumno;
+				datos[posicion][1] = matricula;
+			
+				this.posicion++;
+				this.repeat("t4");
+			} else {
+				this.imprime("Se ha alcanzado el numero maximo de elementos que se pueden ingresar al arreglo, por favor elimina algun registro");
+			}
+		} catch (Exception e) {
+			this.imprime("Error!! seleccionar solo numeros enteros, volver a ejecutar");
+		}
+	}
+	
+	public Integer buscaMatricula(String matricula){
+		Integer encontrado = -1;
+		
+		for (int i = 0; i < datos.length; i++) {
+			if (datos[i][1].equals(matricula)) {
+				encontrado = i;
+				break;
+			}
+		}
+		
+		return encontrado;
+	}
+	
+	public void buscaAlumno(){
+		this.imprime("Matricula a buscar: \t");
+		String matriculaSrc = sc.next();
+		Integer found = this.buscaMatricula(matriculaSrc);
+		
+		if (found >= 0) {
+			this.imprime("Encontrado en posicion ["+ found +"] "+ datos[found][0] +" -> "+ datos[found][1]);
+		} else {
+			this.imprime("Matricula no encontrada");
+		}
+		this.repeat("t4");
+		
+	}
+	
+	public void listarAlumnos(){
+		this.imprime("Alumnos registrados a la fecha");
+		for (int i = 0; i < datos.length; i++) {
+			if (datos[i][0] != null && datos[i][1] != null) {
+				System.out.println( "Posicion ["+ i +"] "+ datos[i][0] +" -> "+ datos[i][1] );
+			}
+		}
+		
+		this.repeat("t4");
+	}
+	
+	public void eliminarAlumno(){
+		this.imprime("Ingresa la matricula a eliminar");
+		String matriculaSrc = sc.next();
+		Integer found = this.buscaMatricula(matriculaSrc);
+		
+		if (found >= 0) {
+			datos[found][0] = null;
+			datos[found][1] = null;
+		} else {
+			this.imprime("Matricula no encontrada");
+		}
+		this.repeat("t4");
 	}
 	
 }
