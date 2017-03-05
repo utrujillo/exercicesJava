@@ -1,5 +1,8 @@
 package tareas;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class metodosTareas {
 	private Scanner sc = new Scanner(System.in);
@@ -11,8 +14,9 @@ public class metodosTareas {
 	public float perimetro;
 	public float PI = 3.1416f;
 	public Integer MAX = 10;
-	public String[][] datos = new String[MAX][2];
+	public Object[][] datos = new Object[MAX][2];
 	public Integer posicion = 0;
+	public ArrayList<Student> datosAL = new ArrayList<Student>();
 	
 	// Metodos generales
 	public void imprime(String valor){
@@ -41,6 +45,8 @@ public class metodosTareas {
 				case "t2": this.menu2(); break;
 				case "t3": this.menu3(); break;
 				case "t4": this.menu4(); break;
+				case "t5": this.menu5(); break;
+				default: this.imprime("Opcion no encontrada"); break;
 			}
 		} else {
 			this.imprime("Gracias por usar el sistema");
@@ -310,14 +316,15 @@ public class metodosTareas {
 	}
 	
 	public void registraAlumno(){
-		String alumno = "", matricula = "";
+		String alumno = "";
+		Integer matricula = null;
 		try {
 			if (posicion < MAX) {
 				this.imprime("Ingresa el nombre del alumno\t");
 				alumno = sc.next();
 				
 				this.imprime("Ingresa la matricula\t");
-				matricula = sc.next();
+				matricula = sc.nextInt();
 				
 				datos[posicion][0] = alumno;
 				datos[posicion][1] = matricula;
@@ -332,11 +339,11 @@ public class metodosTareas {
 		}
 	}
 	
-	public Integer buscaMatricula(String matricula){
+	public Integer buscaMatricula(Integer matricula){
 		Integer encontrado = -1;
 		
 		for (int i = 0; i < datos.length; i++) {
-			if (datos[i][1].equals(matricula)) {
+			if ((Integer)datos[i][1] == (Integer)matricula) {
 				encontrado = i;
 				break;
 			}
@@ -347,7 +354,7 @@ public class metodosTareas {
 	
 	public void buscaAlumno(){
 		this.imprime("Matricula a buscar: \t");
-		String matriculaSrc = sc.next();
+		Integer matriculaSrc = sc.nextInt();
 		Integer found = this.buscaMatricula(matriculaSrc);
 		
 		if (found >= 0) {
@@ -359,7 +366,37 @@ public class metodosTareas {
 		
 	}
 	
+	public void ordenaAlumnos(){
+		String alumnoTmp = null;
+		Integer matriculaTmp = null;
+		for (int i = 0; i < datos.length; i++) {
+			for (int j = 0; j < datos.length - 1; j++) {
+				
+				if( datos[j][1] != null && datos[j+1][1] != null ){
+					
+					if ( (Integer) datos[j][1] > (Integer) datos[j+1][1] ) {
+						// Asignando la variable temporal
+						alumnoTmp = (String) datos[j+1][0];
+						matriculaTmp = (Integer) datos[j+1][1];
+						
+						// Haciendo el cambio de valores
+						datos[j+1][0] = datos[j][0];
+						datos[j+1][1] = datos[j][1];
+						
+						// Asignando la variable temporal al nuevo valor
+						datos[j][0] = alumnoTmp;
+						datos[j][1] = matriculaTmp;
+						
+					}
+				
+				}
+				
+			}
+		}
+	}
+	
 	public void listarAlumnos(){
+		this.ordenaAlumnos();
 		this.imprime("Alumnos registrados a la fecha");
 		for (int i = 0; i < datos.length; i++) {
 			if (datos[i][0] != null && datos[i][1] != null) {
@@ -372,7 +409,7 @@ public class metodosTareas {
 	
 	public void eliminarAlumno(){
 		this.imprime("Ingresa la matricula a eliminar");
-		String matriculaSrc = sc.next();
+		Integer matriculaSrc = sc.nextInt();
 		Integer found = this.buscaMatricula(matriculaSrc);
 		
 		if (found >= 0) {
@@ -383,5 +420,132 @@ public class metodosTareas {
 		}
 		this.repeat("t4");
 	}
+	
+	// Tarea 5 - utilizando arrayList
+	public void menu5(){
+		Integer opcion = 0;
+		this.imprime("Trabajando con arrayList y objectas");
+		this.imprime("1.- Registrar Alumno");
+		this.imprime("2.- Buscar alumno por matricula");
+		this.imprime("3.- Listar alumnos");
+		this.imprime("4.- Eliminar alumno");
+		
+		try {
+			opcion = sc.nextInt();
+			switch (opcion) {
+			case 1: this.registraAlumnoAL(); break;
+			case 2: this.buscaAlumnoAL(); break;
+			case 3: this.listarAlumnosAL(); break;
+			case 4: this.eliminarAlumnoAL(); break;
+			default:
+				this.imprime("Opcion no valida, favor de seleccionar una correcta");
+				this.menu5();
+				break;
+			}
+		} catch (Exception e) {
+			this.imprime("Error!! seleccionar solo numeros enteros, volver a ejecutar");
+		}
+	}
+	
+	public void registraAlumnoAL(){
+		Integer matricula = null;
+		String alumno = null, direccion = null, telefono = null, rfc = null;
+
+		try {
+			
+			this.imprime("Ingresa la matricula: ");
+			matricula = sc.nextInt();
+			sc.nextLine();
+			
+			this.imprime("Ingresa el nombre: ");
+			alumno = sc.nextLine();
+			
+			this.imprime("Ingresa la direccion: ");
+			direccion = sc.nextLine();
+			
+			this.imprime("Ingresa el telefono: ");
+			telefono = sc.nextLine();
+			
+			this.imprime("Ingresa el RFC: ");
+			rfc = sc.nextLine();
+			
+			Student st = new Student(matricula, alumno, direccion, telefono, rfc);
+			datosAL.add(st);
+		
+			this.repeat("t5");
+			
+		} catch (Exception e) {
+			System.out.println( e.getLocalizedMessage() );
+		}
+	}
+	
+	public Student buscaMatriculaAL(Integer matricula){
+		for(Student obj : datosAL){
+			if( obj.getMatricula().equals(matricula) ){
+				return obj;
+			}
+		}
+		return null;
+	}
+	
+	public void buscaAlumnoAL(){
+		this.imprime("Matricula a buscar: ");
+		Integer matriculaSrc = sc.nextInt();
+		Student found = this.buscaMatriculaAL(matriculaSrc);
+		
+		if (found != null) {
+			this.imprime("Matricula encontrada "+ found.getMatricula() +" -> "+ found.getNombre() );
+		} else {
+			this.imprime("Matricula no encontrada");
+		}
+		this.repeat("t5");
+	}
+	
+	public void ordenaAlumnosAL(){
+		/* El ordenamiento lo saque de este video
+		 * https://www.youtube.com/watch?v=wzWFQTLn8hI
+		 */
+		Collections.sort(datosAL, new Comparator<Student>() 
+		{
+			public int compare(Student s1, Student s2){
+				return Integer.valueOf(s1.getMatricula()).compareTo(s2.getMatricula());
+			}
+		});
+	}
+	
+	public void listarAlumnosAL(){
+		this.ordenaAlumnosAL();
+		for(Student obj : datosAL){
+			this.imprime("Matricula: "+ obj.getMatricula() 
+						+" Nombre: "+ obj.getNombre() 
+						+" Direccion: "+ obj.getDireccion() 
+						+" Telefono: "+ obj.getTelefono() 
+						+" RFC: "+ obj.getRFC());
+		}
+		
+		this.repeat("t5");
+	}
+	
+	public void eliminarAlumnoAL(){
+		this.imprime("Matricula a buscar: ");
+		Integer matriculaSrc = sc.nextInt();
+		Boolean matDeleted = false;
+		
+		for (int i = 0; i < datosAL.size(); i++) {
+			if( datosAL.get(i).getMatricula().equals(matriculaSrc) ){
+				datosAL.remove(i);
+				matDeleted = true;
+			}
+		}
+		
+		if (matDeleted) {
+			this.imprime("Matricula eliminada");
+		}else{
+			this.imprime("No se ha eliminado la matricula pues no fue encontrada");
+		}
+		
+		this.repeat("t5");
+	}
+	
 	
 }
