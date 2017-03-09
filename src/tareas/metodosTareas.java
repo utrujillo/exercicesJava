@@ -1,5 +1,6 @@
 package tareas;
 import java.util.Scanner;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,6 +18,8 @@ public class metodosTareas {
 	public Object[][] datos = new Object[MAX][2];
 	public Integer posicion = 0;
 	public ArrayList<Student> datosAL = new ArrayList<Student>();
+	public File path = new File("/Users/codehero/Desktop");
+	public String nameFile = "alumnos.txt";
 	
 	// Metodos generales
 	public void imprime(String valor){
@@ -46,6 +49,7 @@ public class metodosTareas {
 				case "t3": this.menu3(); break;
 				case "t4": this.menu4(); break;
 				case "t5": this.menu5(); break;
+				case "t6": this.menu6(); break; 
 				default: this.imprime("Opcion no encontrada"); break;
 			}
 		} else {
@@ -547,5 +551,94 @@ public class metodosTareas {
 		this.repeat("t5");
 	}
 	
+	// tarea 6
+	public void menu6(){
+		Integer opcion = 0;
+		this.imprime("Trabajando con archivos");
+		this.imprime("1.- Agregar Alumno");
+		this.imprime("2.- Eliminar alumno");
+		this.imprime("3.- Buscar alumno");
+		this.imprime("4.- Listar alumnos");
+		
+		try {
+			opcion = sc.nextInt();
+			switch (opcion) {
+			case 1: this.agregaAlumnoArchivo(); break;
+			case 2: this.eliminaAlumnoArchivo(); break;
+			case 3: this.buscaAlumnoArchivo(); break;
+			case 4: this.listaAlumnoArchivo(); break;
+			default:
+				this.imprime("Opcion no valida, favor de seleccionar una correcta");
+				this.menu4();
+				break;
+			}
+		} catch (Exception e) {
+			this.imprime("Error!! seleccionar solo numeros enteros, volver a ejecutar");
+		}
+	}
+	
+	public void agregaAlumnoArchivo(){
+		PrintStream ps = null;
+        FileOutputStream fos = null;
+        
+        File archivo = new File(this.path, this.nameFile);
+        
+        try{         
+            this.imprime("Agregar información a la agenda");
+            sc.nextLine();
+
+            this.imprime("Matricula: ");
+            String matricula = sc.nextLine();
+            
+            this.imprime("Nombre: ");
+            String nombre = sc.nextLine();
+            
+            this.imprime("Direccion: ");
+            String direccion = sc.nextLine();
+            
+            this.imprime("Telefono: ");
+            String telefono = sc.nextLine();
+            
+            this.imprime("RFC: ");
+            String rfc = sc.nextLine();
+            
+            fos = new FileOutputStream(archivo,true);
+            ps = new PrintStream(fos);
+            ps.println(matricula +"\t|\t"+ nombre +"\t\t|\t"+ direccion +"\t\t\t|\t"+ telefono +"\t|\t"+ rfc);
+            
+            
+        }catch(IOException ex){
+            System.out.printf("\nHa ocurrido un error: %s", ex.toString() );
+        }finally{
+            try{
+                System.out.println("Los datos han sido guardados");
+                this.repeat("t6");
+                ps.close();
+            }catch(Exception ex){
+                System.out.printf("Error al cerrar el flujo: %s", ex.toString());
+            }            
+        }
+	}
+	public void eliminaAlumnoArchivo(){}
+	public void buscaAlumnoArchivo(){}
+	public void listaAlumnoArchivo(){
+		File archivo = new File(path, nameFile);            
+        
+        try{
+            if(archivo.exists()){
+                FileInputStream fis = new FileInputStream(archivo);
+                Scanner sc = new Scanner(fis);
+                while(sc.hasNext()){
+                    this.imprime(sc.nextLine());
+                }
+                sc.close();
+            }else{
+                this.imprime("El archivo que deseas leer no existe");
+                this.repeat("t6");
+            }
+        }catch(IOException ex){
+            System.out.printf("Error: %s", ex.toString());
+        }
+	}
 	
 }
