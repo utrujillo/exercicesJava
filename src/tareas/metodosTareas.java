@@ -604,7 +604,7 @@ public class metodosTareas {
             
             fos = new FileOutputStream(archivo,true);
             ps = new PrintStream(fos);
-            ps.println(matricula +"\t|\t"+ nombre +"\t\t|\t"+ direccion +"\t\t\t|\t"+ telefono +"\t|\t"+ rfc);
+            ps.println(matricula +"-"+ nombre +"-"+ direccion +"-"+ telefono +"-"+ rfc);
             
             
         }catch(IOException ex){
@@ -620,7 +620,49 @@ public class metodosTareas {
         }
 	}
 	public void eliminaAlumnoArchivo(){}
-	public void buscaAlumnoArchivo(){}
+	
+	public Integer buscaMatriculaArchivo(String matricula){
+		File archivo = new File(path, nameFile);
+		
+		Integer found = null, contador = 1;
+        
+        try{
+            if(archivo.exists()){
+                FileInputStream fis = new FileInputStream(archivo);
+                Scanner sc = new Scanner(fis);
+                
+                while(sc.hasNext()){
+                	String parts[] = sc.nextLine().split("-");
+                	
+                	if (matricula.equals(parts[0])) {
+						found = contador;
+					}
+                	contador ++;
+                }
+                sc.close();
+            }else{
+                this.imprime("El archivo que deseas leer no existe");
+                this.repeat("t6");
+            }
+        }catch(IOException ex){
+            System.out.printf("Error: %s", ex.toString());
+        }
+        
+        return found;
+	}
+	public void buscaAlumnoArchivo(){
+		this.imprime("Matricula a buscar: ");
+		sc.nextLine();
+		String matriculaSrc = sc.nextLine();
+		Integer found = this.buscaMatriculaArchivo(matriculaSrc);
+		
+		if (found != null) {
+			this.imprime("Matricula encontrada en la linea "+ found);
+		} else {
+			this.imprime("Matricula no encontrada");
+		}
+		this.repeat("t6");
+	}
 	public void listaAlumnoArchivo(){
 		File archivo = new File(path, nameFile);            
         
@@ -632,6 +674,7 @@ public class metodosTareas {
                     this.imprime(sc.nextLine());
                 }
                 sc.close();
+                this.repeat("t6");
             }else{
                 this.imprime("El archivo que deseas leer no existe");
                 this.repeat("t6");
