@@ -2,6 +2,7 @@ package tareas;
 import java.util.Scanner;
 import java.io.*;
 import java.util.ArrayList;
+//import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -20,6 +21,8 @@ public class metodosTareas {
 	public ArrayList<Student> datosAL = new ArrayList<Student>();
 	public File path = new File("/Users/codehero/Desktop");
 	public String nameFile = "alumnos.txt";
+	public String productFile = "productos.txt";
+	public ArrayList<Producto> productosAL = new ArrayList<Producto>();
 	
 	// Metodos generales
 	public void imprime(String valor){
@@ -49,7 +52,8 @@ public class metodosTareas {
 				case "t3": this.menu3(); break;
 				case "t4": this.menu4(); break;
 				case "t5": this.menu5(); break;
-				case "t6": this.menu6(); break; 
+				case "t6": this.menu6(); break;
+				case "t7": this.menu7(); break;
 				default: this.imprime("Opcion no encontrada"); break;
 			}
 		} else {
@@ -681,6 +685,265 @@ public class metodosTareas {
             }
         }catch(IOException ex){
             System.out.printf("Error: %s", ex.toString());
+        }
+	}
+	
+	// tarea 7
+	public void menu7(){
+		Integer opcion = 0;
+		this.imprime("Trabajando con archivos y arrayList");
+		this.imprime("1.- Alta de productos");
+		this.imprime("2.- Entrada de productos");
+		this.imprime("3.- Salida de productos");
+		this.imprime("4.- Listar productos");
+		this.imprime("5.- Salir");
+		
+		try {
+			opcion = sc.nextInt();
+			switch (opcion) {
+			
+			case 1: this.altaProducto(); break;
+			case 2: this.entradaProducto(); break;
+			case 3: this.salidaProducto(); break;
+			case 4: this.listarProductos(); break;
+			case 5: this.guardarProductos(); break;
+			default:
+				this.imprime("Opcion no valida, favor de seleccionar una correcta");
+				this.menu7();
+				break;
+			}
+		} catch (Exception e) {
+			this.imprime("Error!!: "+ e.toString());
+		}
+	}
+	
+	public void backToMenu(String opcion){
+		String volver;
+		this.imprime("Deseas volver al menu? S/N: ");
+		volver = sc.next();
+
+		if (volver.charAt(0) == 'N' || volver.charAt(0) == 'n') {
+			switch (opcion) {
+				case "altaProducto": this.altaProducto(); break;
+				case "entradaProducto": this.entradaProducto(); break;
+				case "salidaProducto": this.salidaProducto(); break;
+				default: this.imprime("Opcion no encontrada"); break;
+			}
+		} else {
+			this.menu7();
+		}
+	}
+	
+	public void cargaArchivoProductos(){
+		File archivo = new File(this.path, this.productFile);
+        Integer line = 0;
+        try{
+            if(archivo.exists()){
+                FileInputStream fis = new FileInputStream(archivo);
+                Scanner sc = new Scanner(fis);
+                
+                while(sc.hasNext()){
+                	String parts[] = sc.nextLine().split("\t");
+                	//System.out.println( Arrays.toString(parts) );
+                	if(parts.length == 7 && line >= 2){
+                		Producto prod = new Producto();
+                		prod.setCodigo( Integer.parseInt(parts[0]) );
+                		prod.setDescripcion( parts[1] );
+                		prod.setMedida( parts[2] );
+                		prod.setCategoria( parts[3] );
+                		prod.setCantidad( Integer.parseInt( parts[4] ) );
+                		prod.setpCompra( Float.parseFloat( parts[5] ) );
+                		prod.setpVenta( Float.parseFloat( parts[6] ) );
+                		
+                		productosAL.add( prod );
+                	}
+                	line++;
+                }
+                sc.close();
+                this.imprime("Datos cargados correctamente");
+            }
+        }catch(IOException ex){
+            System.out.printf("Error: %s", ex.toString());
+        }
+	}
+	
+	public void altaProducto(){
+		try {
+			Producto prod = new Producto();
+			
+			this.imprime("Ingresa los datos del Producto: ");
+			
+			
+			this.imprime("Codigo: ");
+			prod.setCodigo(sc.nextInt());
+			sc.nextLine();
+			
+			this.imprime("Descripción: ");
+			prod.setDescripcion(sc.nextLine());
+			
+			this.imprime("Medida: ");
+			prod.setMedida(sc.nextLine());
+			
+			this.imprime("Categoría: ");
+			prod.setCategoria(sc.nextLine());
+			
+			prod.setCantidad(0);
+			prod.setpCompra(0f);
+			prod.setpVenta(0f);
+			
+			productosAL.add(prod);
+		
+			this.backToMenu("altaProducto");
+			
+		} catch (Exception e) {
+			System.out.println( e.getLocalizedMessage() );
+		}
+	}
+	
+	public Producto buscaCodigoProducto(Integer codigo){
+		for(Producto item : productosAL){
+			if( item.getCodigo().equals(codigo) ){
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	public void muestraProducto(Producto item){
+		this.imprime("Codigo\tDescripción\tMedida\tCategoria\tCantidad\tP. Compra\tP. Venta");
+		this.imprime("----------------------------------------------------------------------------------------");
+		this.imprime(item.getCodigo() 
+					+"\t"+ item.getDescripcion()
+					+"\t"+ item.getMedida()
+					+"\t"+ item.getCategoria()
+					+"\t"+ item.getCantidad()
+					+"\t"+ item.getpCompra()
+					+"\t"+ item.getpVenta() );
+	}
+	
+	public void entradaProducto(){
+		this.imprime("Codigo a buscar: ");
+		Integer codigoSrc = sc.nextInt();
+		Producto item = this.buscaCodigoProducto(codigoSrc);
+		
+		if (item != null) {
+			// Mostrando datos del item
+			this.muestraProducto(item);
+			
+			// Agregando datos del producto
+			this.imprime("Para agregar la entrada de datos es necesario mostrar los siguientes valores");
+			this.imprime("Cantidad: ");
+			item.setCantidad(sc.nextInt());
+			
+			this.imprime("P. Compra: ");
+			item.setpCompra(sc.nextFloat());
+			
+			this.imprime("P. Venta: ");
+			item.setpVenta(sc.nextFloat());
+			
+		} else {
+			this.imprime("Codigo no encontrado");
+		}
+		this.backToMenu("entradaProducto");
+	}
+	
+	public void salidaProducto(){
+		this.imprime("Codigo a buscar: ");
+		Integer codigoSrc = sc.nextInt();
+		Producto item = this.buscaCodigoProducto(codigoSrc);
+		
+		if (item != null) {
+			// Mostrando datos del item
+			this.muestraProducto(item);
+			
+			// Salida de productos
+			this.imprime("Salida de producto");
+			this.imprime("Cantidad: ");
+			Integer cantidadSalida = sc.nextInt();
+			
+			if( item.getCantidad() - cantidadSalida > 0 ){
+				Float costo = cantidadSalida * item.getpVenta();
+				this.imprime("El costo es: "+ costo);
+				item.setCantidad(item.getCantidad() - cantidadSalida);
+			}else{
+				this.imprime("No contamos con esa cantidad, lo sentimos");
+				this.salidaProducto();
+			}
+			
+		} else {
+			this.imprime("Codigo no encontrado");
+		}
+		this.backToMenu("salidaProducto");
+	}
+	
+	public void ordenaProductos(){
+		Collections.sort(productosAL, new Comparator<Producto>() 
+		{
+			public int compare(Producto p1, Producto p2){
+				return Integer.valueOf(p1.getCodigo()).compareTo(p2.getCodigo());
+			}
+		});
+	}
+	
+	public void listarProductos(){
+		// Ordenamos los productos
+		this.ordenaProductos();
+		
+		// Listamos los productos
+		this.imprime("Codigo\tDescripción\tMedida\tCategoria\tCantidad\tP. Compra\tP. Venta");
+		this.imprime("----------------------------------------------------------------------------------------");
+		for(Producto item : productosAL){
+			this.imprime(item.getCodigo() 
+					+"\t"+ item.getDescripcion()
+					+"\t"+ item.getMedida()
+					+"\t"+ item.getCategoria()
+					+"\t"+ item.getCantidad()
+					+"\t"+ item.getpCompra()
+					+"\t"+ item.getpVenta() );
+		}
+		
+		this.imprime("");
+		this.menu7();
+	}
+	
+	public void guardarProductos(){
+		PrintStream ps = null;
+        FileOutputStream fos = null;
+        
+        File archivo = new File(this.path, this.productFile);
+        
+        try{
+        	// Borramos el archivo
+            archivo.delete();
+        	
+            // Ordenamos los productos
+            this.ordenaProductos();
+            
+            // Guardamos productos en el archivo
+    		fos = new FileOutputStream(archivo,true);
+            ps = new PrintStream(fos);
+            ps.println("Codigo\tDescripción\tMedida\tCategoria\tCantidad\tP. Compra\tP. Venta");
+            ps.println("----------------------------------------------------------------------------------------");
+        	
+        	for(Producto item : productosAL){
+    			ps.println(item.getCodigo() 
+    						+"\t"+ item.getDescripcion()
+    						+"\t"+ item.getMedida()
+    						+"\t"+ item.getCategoria()
+    						+"\t"+ item.getCantidad()
+    						+"\t"+ item.getpCompra()
+    						+"\t"+ item.getpVenta() );
+    		}
+
+        }catch(IOException ex){
+            System.out.printf("\nHa ocurrido un error: %s", ex.toString() );
+        }finally{
+            try{
+                System.out.println("Los datos han sido guardados");
+                ps.close();
+            }catch(Exception ex){
+                System.out.printf("Error al cerrar el flujo: %s", ex.toString());
+            }            
         }
 	}
 	
